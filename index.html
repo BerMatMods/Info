@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Scam WhatsApp V2.1</title>
+  <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Georgia&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #ffffff;
+      --text: #1f1f1f;
+      --card-bg: #f9f9f9;
+      --accent: #4361ee;
+      --success: #06d6a0;
+      --danger: #ef4444;
+      --border: #e5e7eb;
+      --menu-bg: #ffffff;
+      --menu-text: #1f1f1f;
+      --menu-border: #e0e0e0;
+      --pro-bg: #fff8e1;
+      --whatsapp-green: #25D366;
+    }
+
+    .dark-mode {
+      --bg: #121212;
+      --text: #e0e0e0;
+      --card-bg: #1e1e1e;
+      --accent: #4cc9f0;
+      --success: #06d6a0;
+      --menu-bg: #1a1a1a;
+      --menu-text: #f0f0f0;
+      --menu-border: #333;
+      --pro-bg: #2c2600;
+      --whatsapp-green: #128C7E;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      transition: background-color 0.3s, color 0.3s;
+      line-height: 1.5;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      background-color: var(--bg);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .menu-toggle {
+      font-size: 24px;
+      background: none;
+      border: none;
+      color: var(--text);
+      cursor: pointer;
+      margin-left: -12px;
+      padding: 0;
+    }
+
+    .app-title {
+      font-family: 'Creepster', cursive;
+      font-size: 22px;
+      font-weight: 400;
+      color: var(--text);
+      text-align: center;
+      letter-spacing: 1px;
+      flex: 1;
+      margin: 0 16px;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -300px;
+      width: 280px;
+      height: 100vh;
+      background-color: var(--menu-bg);
+      color: var(--menu-text);
+      padding: 20px 0;
+      transition: left 0.3s ease;
+      z-index: 1000;
+      overflow-y: auto;
+      border-right: 1px solid var(--menu-border);
+    }
+
+    .sidebar.active {
+      left: 0;
+    }
+
+    .profile-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 20px 20px;
+      border-bottom: 1px solid var(--menu-border);
+    }
+
+    .profile-pic {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--accent);
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .profile-name {
+      margin-top: 10px;
+      font-weight: 600;
+      font-size: 16px;
+      color: var(--accent);
+    }
+
+    .stats {
+      display: flex;
+      justify-content: space-around;
+      width: 100%;
+      padding: 12px 0;
+      font-size: 13px;
+      color: var(--menu-text);
+      opacity: 0.9;
+    }
+
+    .stat-value {
+      font-weight: bold;
+      color: var(--accent);
+    }
+
+    .sidebar h2 {
+      padding: 16px 20px 12px;
+      font-size: 18px;
+      border-bottom: 1px solid var(--menu-border);
+      color: var(--accent);
+    }
+
+    .sidebar ul {
+      list-style: none;
+      padding: 0 20px;
+    }
+
+    .sidebar li {
+      margin: 10px 0;
+    }
+
+    .sidebar a, .sidebar button {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: 12px 16px;
+      color: var(--menu-text);
+      background: none;
+      border: none;
+      font-size: 16px;
+      font-weight: 600; /* Negrita gruesa */
+      cursor: pointer;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+
+    .sidebar a:hover, .sidebar button:hover {
+      background: rgba(67, 97, 238, 0.1);
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 999;
+      display: none;
+    }
+
+    .overlay.active {
+      display: block;
+    }
+
+    /* Modales */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 3000;
+      display: none;
+    }
+
+    .modal-content {
+      background: var(--card-bg);
+      padding: 24px;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      border: 1px solid var(--border);
+      animation: modalIn 0.3s ease;
+    }
+
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .modal img {
+      max-width: 100%;
+      max-height: 70vh;
+      border-radius: 12px;
+      margin-top: 12px;
+    }
+
+    main {
+      padding: 20px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 14px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+    }
+
+    h1 {
+      font-family: 'Georgia', serif;
+      font-size: 24px;
+      margin-bottom: 16px;
+      text-align: center;
+      color: var(--accent);
+      font-weight: bold;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      font-size: 15px;
+      color: var(--text);
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 16px;
+      background: var(--bg);
+      color: var(--text);
+      margin-bottom: 16px;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      background-color: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 17px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .whatsapp-btn {
+      background-color: var(--whatsapp-green) !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-weight: 600;
+    }
+
+    .whatsapp-btn:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(37, 211, 102, 0.3);
+    }
+
+    .terminal {
+      background: var(--card-bg);
+      color: var(--text);
+      padding: 16px;
+      border-radius: 10px;
+      height: 300px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 13px;
+      white-space: pre-wrap;
+      border: 1px solid var(--border);
+      margin-top: 16px;
+    }
+
+    .progress-container {
+      display: flex;
+      align-items: center;
+      margin: 6px 0 12px;
+    }
+
+    .progress-bar {
+      flex: 1;
+      height: 6px;
+      background: #e0e0e0;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-right: 8px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .progress-percent {
+      font-size: 12px;
+      min-width: 36px;
+      text-align: right;
+      color: var(--text);
+    }
+
+    .history-item {
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+
+    .benefit-list {
+      text-align: left;
+      padding-left: 20px;
+      margin: 12px 0;
+    }
+
+    .benefit-list li {
+      margin: 8px 0;
+      color: var(--text);
+    }
+
+    .price-offer {
+      text-align: center;
+      margin: 16px 0;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .original-price {
+      text-decoration: line-through;
+      color: #999;
+      margin-right: 8px;
+    }
+
+    .final-price {
+      color: #d32f2f;
+      font-size: 22px;
+    }
+
+    .pro-section {
+      background: var(--pro-bg) !important;
+      border: 1px solid #ffd54f;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 12px;
+      color: var(--text);
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+  <!-- Barra superior -->
+  <header>
+    <button class="menu-toggle" id="menuBtn">☰</button>
+    <div class="app-title">Scam WhatsApp V2.1</div>
+    <div style="width: 24px;"></div>
+  </header>
+
+  <!-- Menú lateral -->
+  <div class="sidebar" id="sidebar">
+    <div class="profile-container">
+      <img src="https://i.postimg.cc/0NmCGnGV/Screenshot-20251001-181853.jpg" alt="AnthZz Berrocal" class="profile-pic" id="profilePic">
+      <div class="profile-name">AnthZz Berrocal</div>
+    </div>
+    <div class="stats">
+      <div>Premium: <span id="premiumCount" class="stat-value">183</span></div>
+      <div>Activos: <span id="activeCount" class="stat-value">5</span></div>
+    </div>
+    <h2>Menú</h2>
+    <ul>
+      <li><a href="#" onclick="showSection('home')">🏠 Inicio</a></li>
+      <li><a href="#" onclick="showSection('hacked')">📁 Archivos Hackeados</a></li>
+      <li><a href="#" onclick="showSection('history')">🕒 Historial</a></li>
+      <li><a href="#" onclick="showSection('about')">ℹ️ Acerca de</a></li>
+      <li><a href="#" onclick="showSection('pro')">👑 Versión Pro</a></li>
+      <li>
+        <button id="themeToggleMenu">🌓 Modo Oscuro</button>
+      </li>
+    </ul>
+  </div>
+
+  <div class="overlay" id="overlay"></div>
+
+  <!-- Modal: Imagen de perfil -->
+  <div class="modal" id="imageModal">
+    <div class="modal-content">
+      <h2>AnthZz Berrocal</h2>
+      <img src="https://i.postimg.cc/0NmCGnGV/Screenshot-20251001-181853.jpg" alt="Perfil">
+      <button id="closeImageModal" style="margin-top:16px;">Cerrar</button>
+    </div>
+  </div>
+
+  <!-- Modal: Éxito -->
+  <div class="modal" id="successModal">
+    <div class="modal-content">
+      <h2>¡WhatsApp Hackeado!</h2>
+      <p>El número ha sido Hackeado con éxito. Para ver chats eliminados, mensajes antiguos, llamadas, contactos bloqueados y más, ve a <strong>Archivos Hackeados</strong>.</p>
+      <button id="modalClose">OK</button>
+    </div>
+  </div>
+
+  <!-- Modal: Error -->
+  <div class="modal" id="errorModal">
+    <div class="modal-content">
+      <h2>⚠️ Error</h2>
+      <p id="errorMessage">Número inválido.</p>
+      <button id="errorClose">OK</button>
+    </div>
+  </div>
+
+  <main>
+    <!-- INICIO -->
+    <div id="homeSection" class="section">
+      <div class="card">
+        <h1>Hackear WhatsApp</h1>
+        <label for="targetNumber">Número de WhatsApp (Nacional +51)</label>
+        <input type="tel" id="targetNumber" placeholder="+51987654321" />
+        <button id="hackBtn">Iniciar Hackeo</button>
+        <div class="terminal" id="terminal">[Sistema Activa] VPN Conectada ala base de 𖤍𝐁𝐞𝐫𝐌𝐚𝐭_𝐂𝐨𝐝𝐞𖤍 ...</div>
+      </div>
+    </div>
+
+    <!-- ARCHIVOS HACKEADOS -->
+    <div id="hackedSection" class="section" style="display:none;">
+      <div class="card">
+        <h1>📁 Archivos Hackeados</h1>
+        <p style="text-align:center; margin-bottom:20px;">
+          Para ver los resultados del hackeo (chats eliminados, llamadas, mensajes antiguos, contactos bloqueados, etc.), debes iniciar sesión.
+        </p>
+        <label for="loginNumber">Número de Acceso</label>
+        <input type="tel" id="loginNumber" placeholder="930569195" maxlength="9" />
+        <label for="loginPassword">Contraseña</label>
+        <input type="password" id="loginPassword" placeholder="••••••••" />
+        <div id="loginError" style="color: var(--danger); text-align: center; margin: 10px 0;"></div>
+        <button id="loginSubmit">Iniciar Sesión</button>
+        <p style="margin-top: 16px; font-size: 14px;">
+          ¿No tienes acceso? 
+          <br>
+          <button class="whatsapp-btn" onclick="window.open('https://wa.me/51930569195?text=Hola,%20quiero%20obtener%20la%20versión%20Pro%20del%20extractor%20de%20WhatsApp.', '_blank')">
+            💬 Solicitar Versión Pro
+          </button>
+        </p>
+      </div>
+    </div>
+
+    <!-- HISTORIAL -->
+    <div id="historySection" class="section" style="display:none;">
+      <div class="card">
+        <h1>🕒 Historial de Hackeos</h1>
+        <div id="historyList">
+          <p>No hay hackeos recientes.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACERCA DE -->
+    <div id="aboutSection" class="section" style="display:none;">
+      <div class="card">
+        <h1>ℹ️ Acerca de</h1>
+        <p><strong>Desarrollador:</strong> AnthZz Berrocal</p>
+        <p><strong>Herramienta:</strong> Scam WhatsApp V2.1</p>
+        <p><strong>Lanzamiento:</strong> 03/01/2026</p>
+        <p style="margin-top:16px; color:var(--danger);">
+          ⚠️ Esta herramienta fue desarrollada con fines educativos.<br>
+          No me hago responsable del mal uso que le puedan dar.
+        </p>
+      </div>
+    </div>
+
+    <!-- VERSIÓN PRO -->
+    <div id="proSection" class="section" style="display:none;">
+      <div class="card pro-section">
+        <h1>👑 Versión Pro (Premium)</h1>
+        
+        <div class="price-offer">
+          <span class="original-price">S/69.90</span>
+          <span class="final-price">S/39.90</span>
+          <div style="font-size:14px; color:#d32f2f; margin-top:4px;">¡40% OFF para nuevos usuarios!</div>
+        </div>
+
+        <p>Obtén acceso completo con los siguientes beneficios:</p>
+        <ul class="benefit-list">
+          <li>✅ Soporte técnico 24/7</li>
+          <li>✅ Extracción de datos en formato APK</li>
+          <li>✅ Recuperación de chats eliminados (hasta 1 año)</li>
+          <li>✅ Acceso en tiempo real a mensajes y llamadas</li>
+          <li>✅ Visualización de contactos bloqueados y ocultos</li>
+          <li>✅ Informe forense descargable (PDF/TXT)</li>
+        </ul>
+        
+        <button class="whatsapp-btn" onclick="window.open('https://wa.me/51930569195?text=Hola,%20quiero%20obtener%20la%20versión%20Pro%20del%20extractor%20de%20WhatsApp.', '_blank')">
+          💬 Contactar por WhatsApp
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    © 2026 AnthZz Berrocal • 𖤍𝐁𝐞𝐫𝐌𝐚𝐭_𝐂𝐨𝐝𝐞𖤍
+  </footer>
+
+  <script>
+    let currentTarget = null;
+    let hackCompleted = false;
+    const BASE_PREMIUM = 183;
+    const HACK_BTN = document.getElementById('hackBtn');
+    let lastActiveUpdate = 0;
+    let cachedActive = 5;
+
+    function calculatePremiumUsers() {
+      const startDate = new Date('2026-01-01');
+      const today = new Date();
+      const diffTime = Math.abs(today - startDate);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      return BASE_PREMIUM + Math.floor(diffDays * 2.5);
+    }
+
+    function getActiveUsers() {
+      const now = Date.now();
+      if (now - lastActiveUpdate > 10 * 60 * 1000) {
+        cachedActive = Math.floor(Math.random() * 19) + 2;
+        lastActiveUpdate = now;
+      }
+      return cachedActive;
+    }
+
+    function animateCount(element, start, end, duration = 1000) {
+      let startTimestamp = null;
+      const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        element.textContent = Math.floor(progress * (end - start) + start);
+        if (progress < 1) window.requestAnimationFrame(step);
+      };
+      window.requestAnimationFrame(step);
+    }
+
+    function updateStats() {
+      const premium = calculatePremiumUsers();
+      const active = getActiveUsers();
+      animateCount(document.getElementById('premiumCount'), 0, premium, 800);
+      animateCount(document.getElementById('activeCount'), 0, active, 800);
+    }
+
+    function saveToHistory(number) {
+      const history = JSON.parse(localStorage.getItem('hackHistory') || '[]');
+      history.unshift({
+        number,
+        date: new Date().toLocaleString('es-ES')
+      });
+      localStorage.setItem('hackHistory', JSON.stringify(history.slice(0, 10)));
+    }
+
+    function loadHistory() {
+      const history = JSON.parse(localStorage.getItem('hackHistory') || '[]');
+      const list = document.getElementById('historyList');
+      if (history.length === 0) {
+        list.innerHTML = '<p>No hay hackeos recientes.</p>';
+        return;
+      }
+      list.innerHTML = '';
+      history.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'history-item';
+        div.innerHTML = `<strong>${item.number}</strong><br><small>${item.date}</small>`;
+        list.appendChild(div);
+      });
+    }
+
+    document.getElementById('menuBtn').addEventListener('click', () => {
+      document.getElementById('sidebar').classList.add('active');
+      document.getElementById('overlay').classList.add('active');
+      updateStats();
+      loadHistory();
+    });
+
+    document.getElementById('overlay').addEventListener('click', () => {
+      document.getElementById('sidebar').classList.remove('active');
+      document.getElementById('overlay').classList.remove('active');
+    });
+
+    document.getElementById('profilePic').addEventListener('click', () => {
+      document.getElementById('imageModal').style.display = 'flex';
+    });
+
+    document.getElementById('closeImageModal').addEventListener('click', () => {
+      document.getElementById('imageModal').style.display = 'none';
+    });
+
+    document.getElementById('modalClose').addEventListener('click', () => {
+      document.getElementById('successModal').style.display = 'none';
+    });
+
+    document.getElementById('errorClose').addEventListener('click', () => {
+      document.getElementById('errorModal').style.display = 'none';
+    });
+
+    function showModal(modalId, message = '') {
+      if (message) document.getElementById('errorMessage').textContent = message;
+      document.getElementById(modalId).style.display = 'flex';
+    }
+
+    function showSection(section) {
+      document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+      if (section === 'hacked') document.getElementById('hackedSection').style.display = 'block';
+      else if (section === 'history') {
+        document.getElementById('historySection').style.display = 'block';
+        loadHistory();
+      }
+      else if (section === 'about') document.getElementById('aboutSection').style.display = 'block';
+      else if (section === 'pro') document.getElementById('proSection').style.display = 'block';
+      else document.getElementById('homeSection').style.display = 'block';
+      
+      document.getElementById('sidebar').classList.remove('active');
+      document.getElementById('overlay').classList.remove('active');
+    }
+
+    const themeToggle = document.getElementById('themeToggleMenu');
+    const body = document.body;
+    if (localStorage.getItem('theme') === 'dark') {
+      body.classList.add('dark-mode');
+      themeToggle.textContent = '☀️ Modo Claro';
+    } else {
+      themeToggle.textContent = '🌓 Modo Oscuro';
+    }
+
+    themeToggle.addEventListener('click', () => {
+      body.classList.toggle('dark-mode');
+      if (body.classList.contains('dark-mode')) {
+        localStorage.setItem('theme', 'dark');
+        themeToggle.textContent = '☀️ Modo Claro';
+      } else {
+        localStorage.setItem('theme', 'light');
+        themeToggle.textContent = '🌓 Modo Oscuro';
+      }
+    });
+
+    function simulateProgress(label, duration = 800) {
+      return new Promise(resolve => {
+        const terminal = document.getElementById('terminal');
+        const now = new Date().toLocaleTimeString();
+        terminal.innerHTML += `\n[${now}] ${label}`;
+        
+        const container = document.createElement('div');
+        container.className = 'progress-container';
+        const bar = document.createElement('div');
+        bar.className = 'progress-bar';
+        const fill = document.createElement('div');
+        fill.className = 'progress-fill';
+        bar.appendChild(fill);
+        const percent = document.createElement('div');
+        percent.className = 'progress-percent';
+        percent.textContent = '0%';
+        container.appendChild(bar);
+        container.appendChild(percent);
+        terminal.appendChild(container);
+        terminal.scrollTop = terminal.scrollHeight;
+
+        let progress = 0;
+        const interval = setInterval(() => {
+          progress += 2;
+          fill.style.width = `${progress}%`;
+          percent.textContent = `${progress}%`;
+          terminal.scrollTop = terminal.scrollHeight;
+          if (progress >= 100) {
+            clearInterval(interval);
+            percent.textContent = '100%';
+            setTimeout(() => {
+              terminal.scrollTop = terminal.scrollHeight;
+              resolve();
+            }, 100);
+          }
+        }, duration / 50);
+      });
+    }
+
+    HACK_BTN.addEventListener('click', async () => {
+      const number = document.getElementById('targetNumber').value.trim();
+      if (!number || number.length < 8 || !number.startsWith('+')) {
+        showModal('errorModal', 'Ingresa un número internacional válido (ej: +51987654321).');
+        return;
+      }
+
+      HACK_BTN.textContent = 'Hackeando WhatsApp...';
+      HACK_BTN.disabled = true;
+
+      currentTarget = number;
+      hackCompleted = false;
+      const terminal = document.getElementById('terminal');
+      terminal.innerHTML = '';
+
+      const steps = [
+        "Conectando a red segura: 𖤍𝐁𝐞𝐫𝐌𝐚𝐭_𝐂𝐨𝐝𝐞𖤍",
+        "Estableciendo túnel cifrado (Nodo: PE-09)",
+        `Escaneando WhatsApp: ${number}`,
+        "Inyectando token de sesión forense",
+        "Accediendo a base de respaldo local",
+        "Recuperando mensajes eliminados",
+        "Extrayendo historial de llamadas",
+        "Buscando chats archivados",
+        "Recuperando contactos bloqueados",
+        "Accediendo a chats restringidos",
+        "Buscando mensajes de hasta 6 meses atrás",
+        "Descifrando metadatos ocultos",
+        "Sincronizando con servidores locales",
+        "Generando informe forense completo",
+        "Liberando recursos del sistema"
+      ];
+
+      for (const step of steps) {
+        await simulateProgress(step);
+      }
+
+      hackCompleted = true;
+      saveToHistory(number);
+      showModal('successModal');
+
+      HACK_BTN.textContent = 'Hackear otro usuario';
+      HACK_BTN.onclick = () => {
+        document.getElementById('targetNumber').value = '';
+        HACK_BTN.textContent = 'Iniciar Hackeo';
+        HACK_BTN.onclick = HACK_BTN._originalOnClick;
+        HACK_BTN.disabled = false;
+        terminal.innerHTML = '[Sistema Activa] VPN Conectada ala base de 𖤍𝐁𝐞𝐫𝐌𝐚𝐭_𝐂𝐨𝐝𝐞𖤍 ...';
+      };
+      HACK_BTN._originalOnClick = HACK_BTN.onclick;
+    });
+
+    document.getElementById('loginSubmit').addEventListener('click', () => {
+      const num = document.getElementById('loginNumber').value.trim();
+      const pass = document.getElementById('loginPassword').value;
+      const error = document.getElementById('loginError');
+
+      document.getElementById('loginNumber').value = '';
+      document.getElementById('loginPassword').value = '';
+
+      if (num === '930569195' && pass === 'BerMatCode') {
+        if (hackCompleted && currentTarget) {
+          const report = 
+            `📱 Archivos Hackeados - ${currentTarget}\n\n` +
+            `✅ Mensajes recuperados: ${Math.floor(Math.random() * 2000) + 800}\n` +
+            `📞 Llamadas registradas: ${Math.floor(Math.random() * 250) + 60}\n` +
+            `🚫 Contactos bloqueados: ${Math.floor(Math.random() * 40) + 5}\n` +
+            `🔒 Chats restringidos: ${Math.floor(Math.random() * 15) + 2}\n` +
+            `👁️ Chats ocultos: ${Math.floor(Math.random() * 25) + 8}\n` +
+            `⏳ Mensajes antiguos (6 meses): ${Math.floor(Math.random() * 500) + 200}\n\n` +
+            `📡 Extraído vía red 𖤍𝐁𝐞𝐫𝐌𝐚𝐭_𝐂𝐨𝐝𝐞𖤍`;
+
+          alert(report);
+        } else {
+          showModal('errorModal', 'No hay hackeos recientes.');
+        }
+      } else {
+        error.textContent = '⚠️ Credenciales incorrectas.';
+        setTimeout(() => error.textContent = '', 3000);
+      }
+    });
+  </script>
+</body>
+</html>
